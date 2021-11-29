@@ -23,15 +23,15 @@ process.on("uncaughtException", (err) => {
 app.use(morgan("tiny"));
 // ............................parsers............................
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.JWT_SECRET));
 
-// ............................routes........................h2....
+// ............................routes............................
 
 app.get("/", (req, res) => {
   res.send("<h2>The home page<h2/>");
 });
 app.get("/api/v1", (req, res) => {
-  console.log(req.cookies);
+  console.log(req.signedCookies);
 
   res.send("<h2>Dummy<h2/>");
 });

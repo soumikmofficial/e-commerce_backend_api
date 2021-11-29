@@ -3,12 +3,7 @@ const CustomError = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const { attachCookiesToResponse } = require("../utils");
 
-const login = (req, res) => {
-  res.status(200).json({ message: "logged in succcessfully" });
-};
-const logout = (req, res) => {
-  res.status(200).json({ message: "logged out succcessfully" });
-};
+// ..........................register............................
 const register = async (req, res) => {
   const { email, name, password } = req.body;
   const isFirst = (await User.countDocuments({})) === 0;
@@ -21,9 +16,48 @@ const register = async (req, res) => {
 
   const newUser = await User.create({ name, email, password, role });
 
-  attachCookiesToResponse({ res, user: newUser });
+  const tokenUser = {
+    name: newUser.name,
+    role: newUser.role,
+    id: newUser._id,
+  };
+  attachCookiesToResponse({ res, user: tokenUser });
 
   res.status(StatusCodes.CREATED).json({ success: true, user: newUser });
+};
+
+// ..............................login...........................
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new CustomError.BadRequestError("Please provide email and password");
+  }
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    throw new CustomError.UnauthorizedError(`Login Unsuccessful`);
+  }
+  const isMatch = await user.verifyPassword(password);
+
+  if (!isMatch) {
+    throw new CustomError.UnauthorizedError(`Login Unsuccessful`);
+  }
+  const tokenUser = {
+    name: user.name,
+    role: user.role,
+    id: user._id,
+  };
+  attachCookiesToResponse({ res, user: tokenUser });
+
+  res.status(StatusCodes.OK).json({ message: "logged in succcessfully" });
+};
+
+// ..............logout.............................
+const logout = (req, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.status(200).json({ message: "logged out succcessfully" });
 };
 
 module.exports = { login, logout, register };

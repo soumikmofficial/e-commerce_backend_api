@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// hash password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
@@ -42,5 +43,12 @@ userSchema.pre("save", async function (next) {
     console.log(error);
   }
 });
+
+// verify password
+userSchema.methods.verifyPassword = async function (input) {
+  const isMatch = await bcrypt.compare(input, this.password);
+  console.log(isMatch);
+  return isMatch;
+};
 
 module.exports = mongoose.model("User", userSchema);
