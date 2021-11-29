@@ -6,6 +6,8 @@ const connectDB = require("./config/connect");
 // error
 const notFoundPage = require("./middlewares/not-found-page");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
+// others
+const morgan = require("morgan");
 
 const app = express();
 
@@ -15,6 +17,7 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
+app.use(morgan("tiny"));
 // ............................body parsers............................
 app.use(express.json());
 
