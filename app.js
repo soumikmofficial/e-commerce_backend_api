@@ -3,6 +3,10 @@ require("express-async-errors");
 
 const express = require("express");
 const connectDB = require("./config/connect");
+// error
+const notFoundPage = require("./middlewares/not-found-page");
+const errorHandlerMiddleware = require("./middlewares/error-handler");
+
 const app = express();
 
 process.on("uncaughtException", (err) => {
@@ -13,7 +17,6 @@ process.on("uncaughtException", (err) => {
 
 // ............................body parsers............................
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 // ............................routes........................h2....
 
@@ -21,8 +24,11 @@ app.get("/", (req, res) => res.send("<h2>The home page<h2/>"));
 
 // ............................error handlers............................
 
+app.use(notFoundPage);
+app.use(errorHandlerMiddleware);
+
 // ..................................server and database...........................
-connectDB();
+connectDB(notFoundPage);
 
 const port = process.env.PORT || 3000;
 
