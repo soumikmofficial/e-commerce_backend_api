@@ -8,6 +8,9 @@ const notFoundPage = require("./middlewares/not-found-page");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 // others
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+// routes
+const authRouter = require("./routes/authRoutes");
 
 const app = express();
 
@@ -18,12 +21,21 @@ process.on("uncaughtException", (err) => {
 });
 
 app.use(morgan("tiny"));
-// ............................body parsers............................
+// ............................parsers............................
 app.use(express.json());
+app.use(cookieParser());
 
 // ............................routes........................h2....
 
-app.get("/", (req, res) => res.send("<h2>The home page<h2/>"));
+app.get("/", (req, res) => {
+  res.send("<h2>The home page<h2/>");
+});
+app.get("/api/v1", (req, res) => {
+  console.log(req.cookies);
+
+  res.send("<h2>Dummy<h2/>");
+});
+app.use("/api/v1/auth", authRouter);
 
 // ............................error handlers............................
 
