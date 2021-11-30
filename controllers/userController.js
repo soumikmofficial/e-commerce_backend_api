@@ -4,7 +4,6 @@ const CustomError = require("../errors");
 
 // ................all users.......................
 const getAllUsers = async (req, res) => {
-  console.log(`the user is ${req.user.name}`);
   const users = await User.find({});
   res
     .status(StatusCodes.OK)
@@ -24,11 +23,29 @@ const getSingleUser = async (req, res) => {
 const updateUser = async (req, res) => {
   res.send("Updated User");
 };
+
+// ....................upadate password .............................
 const updateUserPassword = async (req, res) => {
-  res.send("Update Pasword");
+  const { userId } = req.user;
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new CustomError.BadRequestError(
+      "Please provide both old password and new password"
+    );
+  }
+  const user = await User.findOne({ _id: userId }).select("+password");
+  const isMatch = await user.verifyPassword(oldPassword);
+  if (!isMatch) {
+    throw new CustomError.BadRequestError("Incorrect password");
+  }
+  user.password = newPassword;
+  user.save();
+  res.status(StatusCodes.OK).json({ message: `password updated successfully` });
 };
+
+// ....................show me ...............
 const showCurrentUser = async (req, res) => {
-  res.send("Showing current user");
+  res.status(StatusCodes.OK).json({ user: req.user });
 };
 
 module.exports = {

@@ -15,9 +15,9 @@ const {
 router
   .route("/")
   .get(authentication, authorizePermissions("admin"), getAllUsers);
-router.route("/showMe").post(showCurrentUser);
+router.route("/showMe").post(authentication, showCurrentUser);
 router.route("/:id").get(getSingleUser);
 router.route("/update").patch(updateUser);
-router.route("/updateUserPassword").patch(updateUserPassword);
+router.route("/updateUserPassword").patch(authentication, updateUserPassword);
 
 module.exports = router;
