@@ -10,8 +10,7 @@ const createJWT = ({ payload }) => {
   return token;
 };
 
-const verifyJWT = async ({ token }) =>
-  jwt.verify(token, process.env.JWT_SECRET);
+const verifyJWT = ({ token }) => jwt.verify(token, process.env.JWT_SECRET);
 
 const attachCookiesToResponse = ({ res, user }) => {
   const token = createJWT({ payload: user });
