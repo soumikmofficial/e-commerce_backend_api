@@ -16,7 +16,7 @@ const register = async (req, res) => {
 
   const newUser = await User.create({ name, email, password, role });
 
-  attachCookiesToResponse({ res, user: createTokenUser(user) });
+  attachCookiesToResponse({ res, user: createTokenUser(newUser) });
 
   res.status(StatusCodes.CREATED).json({ success: true, user: newUser });
 };

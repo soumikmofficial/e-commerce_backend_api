@@ -1,7 +1,11 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { createTokenUser } = require("../utils");
+const {
+  createTokenUser,
+  attachCookiesToResponse,
+  checkPermissions,
+} = require("../utils");
 
 // ................all users.......................
 const getAllUsers = async (req, res) => {
@@ -14,16 +18,31 @@ const getAllUsers = async (req, res) => {
 // .................single user......................
 const getSingleUser = async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
-  createTokenUser(user);
   if (!user) {
     throw new CustomError.NotFoundError("User does not exist");
   }
+  checkPermissions(req.user, user._id);
+
   res.status(StatusCodes.OK).json({ success: true, user });
 };
 
 // .....................update user......................
 const updateUser = async (req, res) => {
-  res.send("Updated User");
+  const { email, name } = req.body;
+  if (!name || !email) {
+    throw new CustomError.BadRequestError("Provide all fields");
+  }
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: req.user.userId },
+    { name, email },
+    { new: true, runValidators: true }
+  );
+
+  const tokenUser = createTokenUser(updatedUser);
+
+  attachCookiesToResponse({ res, user: tokenUser });
+
+  res.status(StatusCodes.OK).json({ success: true });
 };
 
 // ....................upadate password .............................
@@ -41,8 +60,8 @@ const updateUserPassword = async (req, res) => {
     throw new CustomError.BadRequestError("Incorrect password");
   }
   user.password = newPassword;
-  user.save();
-  res.status(StatusCodes.OK).json({ message: `password updated successfully` });
+  await user.save();
+  res.status(StatusCodes.OK).json({ success: true });
 };
 
 // ....................show me ...............
