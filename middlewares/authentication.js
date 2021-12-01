@@ -5,7 +5,7 @@ const authentication = async (req, res, next) => {
   const token = req.signedCookies.token;
   if (!token) {
     throw new CustomError.UnauthorizedError(
-      "Not authorized to log in... Try logging in"
+      "Not authorized... Try logging in again"
     );
   }
   try {
@@ -14,7 +14,7 @@ const authentication = async (req, res, next) => {
     next();
   } catch (error) {
     throw new CustomError.UnauthorizedError(
-      "Not authorized to log in... Try logging in"
+      "Not authorized... Try logging in again"
     );
   }
 };

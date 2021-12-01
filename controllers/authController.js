@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const CustomError = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const { attachCookiesToResponse } = require("../utils");
+const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 // ..........................register............................
 const register = async (req, res) => {
@@ -16,12 +16,7 @@ const register = async (req, res) => {
 
   const newUser = await User.create({ name, email, password, role });
 
-  const tokenUser = {
-    name: newUser.name,
-    role: newUser.role,
-    userId: newUser._id,
-  };
-  attachCookiesToResponse({ res, user: tokenUser });
+  attachCookiesToResponse({ res, user: createTokenUser(user) });
 
   res.status(StatusCodes.CREATED).json({ success: true, user: newUser });
 };
@@ -41,12 +36,8 @@ const login = async (req, res) => {
   if (!isMatch) {
     throw new CustomError.UnauthorizedError(`Login Unsuccessful`);
   }
-  const tokenUser = {
-    name: user.name,
-    role: user.role,
-    userId: user._id,
-  };
-  attachCookiesToResponse({ res, user: tokenUser });
+
+  attachCookiesToResponse({ res, user: createTokenUser(user) });
 
   res.status(StatusCodes.OK).json({ message: "logged in succcessfully" });
 };
