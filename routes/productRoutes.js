@@ -16,12 +16,14 @@ const {
 router
   .route("/")
   .get(getAllProducts)
-  .post(authentication, authorizePermissions, createProduct);
-router.route("/upload").post(authentication, authorizePermissions, uploadImage);
+  .post(authentication, authorizePermissions("admin"), createProduct);
+router
+  .route("/upload")
+  .post(authentication, authorizePermissions("admin"), uploadImage);
 router
   .route("/:id")
   .get(getSingleProduct)
-  .patch(authentication, authorizePermissions, updateProduct)
-  .delete(authentication, authorizePermissions, deleteProduct);
+  .patch(authentication, authorizePermissions("admin"), updateProduct)
+  .delete(authentication, authorizePermissions("admin"), deleteProduct);
 
 module.exports = router;
