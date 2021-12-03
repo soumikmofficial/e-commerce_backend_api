@@ -1,10 +1,12 @@
 const Product = require("../models/Product");
+const path = require("path");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const { findOneAndUpdate } = require("../models/Product");
 
 // ................all products.......................
 const getAllProducts = async (req, res) => {
+  console.log(req.files);
   const products = await Product.find({});
   res
     .status(StatusCodes.OK)
@@ -61,8 +63,26 @@ const deleteProduct = async (req, res) => {
 
 // ....................upload image ...............
 const uploadImage = async (req, res) => {
+  if (!req.files) {
+    throw new CustomError.BadRequestError("Please add an image file");
+  }
+  const imageFile = req.files.image;
+
+  if (!imageFile.mimetype.startsWith("image")) {
+    throw new CustomError.BadRequestError(
+      "Only image files are accepted... please try again"
+    );
+  }
+  const maxSize = 1024 * 1024;
+  if (imageFile.size > maxSize) {
+    throw new CustomError.BadRequestError("File too large to be uploaded");
+  }
+  const imagePath = path.join(__dirname, `../public/uploads/${imageFile.name}`);
   res.send("upload image");
-  //   res.status(StatusCodes.OK).json({ product: req.product });
+  imageFile.mv(imagePath);
+  res
+    .status(StatusCodes.OK)
+    .json({ success: true, image: `/uploads/${imageFile.name}` });
 };
 
 module.exports = {
