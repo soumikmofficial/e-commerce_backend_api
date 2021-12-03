@@ -2,11 +2,9 @@ const Product = require("../models/Product");
 const path = require("path");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { findOneAndUpdate } = require("../models/Product");
 
 // ................all products.......................
 const getAllProducts = async (req, res) => {
-  console.log(req.files);
   const products = await Product.find({});
   res
     .status(StatusCodes.OK)
@@ -18,7 +16,7 @@ const getSingleProduct = async (req, res) => {
   const product = await Product.findOne({ _id: req.params.id });
   if (!product) {
     throw new CustomError.NotFoundError(
-      `Coldn't find product with id: ${req.params.id}`
+      `Couldn't find product with id: ${req.params.id}`
     );
   }
   res.status(StatusCodes.OK).json({ success: true, product });
