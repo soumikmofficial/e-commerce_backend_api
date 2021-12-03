@@ -13,6 +13,8 @@ const {
   uploadImage,
 } = require("../controllers/productController");
 
+const { getSingleProductReviews } = require("../controllers/reviewController");
+
 router
   .route("/")
   .get(getAllProducts)
@@ -25,5 +27,6 @@ router
   .get(getSingleProduct)
   .patch(authentication, authorizePermissions("admin"), updateProduct)
   .delete(authentication, authorizePermissions("admin"), deleteProduct);
+router.route("/:id/reviews").get(getSingleProductReviews);
 
 module.exports = router;

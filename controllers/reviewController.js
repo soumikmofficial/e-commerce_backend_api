@@ -82,10 +82,19 @@ const deleteReview = async (req, res) => {
   });
 };
 
+// .....................................get single product reviews......................
+const getSingleProductReviews = async (req, res) => {
+  const reviews = await Review.find({ product: req.params.id });
+  res
+    .status(StatusCodes.OK)
+    .json({ success: true, total: reviews.length, reviews });
+};
+
 module.exports = {
   getAllReviews,
   getSingleReview,
   updateReview,
   createReview,
   deleteReview,
+  getSingleProductReviews,
 };

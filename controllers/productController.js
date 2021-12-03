@@ -5,7 +5,7 @@ const CustomError = require("../errors");
 
 // ................all products.......................
 const getAllProducts = async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).populate("reviews");
   res
     .status(StatusCodes.OK)
     .json({ success: true, total: products.length, products });
@@ -13,7 +13,9 @@ const getAllProducts = async (req, res) => {
 
 // .................single product......................
 const getSingleProduct = async (req, res) => {
-  const product = await Product.findOne({ _id: req.params.id });
+  const product = await Product.findOne({ _id: req.params.id }).populate(
+    "reviews"
+  );
   if (!product) {
     throw new CustomError.NotFoundError(
       `Couldn't find product with id: ${req.params.id}`
