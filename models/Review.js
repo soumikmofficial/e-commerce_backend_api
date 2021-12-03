@@ -12,9 +12,11 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxLength: [100, `Title shouldn't exceed 100 characters`],
+      required: true,
     },
     comment: {
       type: String,
+      required: true,
     },
     user: {
       type: mongoose.Schema.ObjectId,

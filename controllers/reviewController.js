@@ -1,7 +1,8 @@
+const { StatusCodes } = require("http-status-codes");
 const Review = require("../models/Review");
 const Product = require("../models/Product");
-const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
+const { checkPermissions } = require("../utils");
 
 // ................all reviews.......................
 const getAllReviews = async (req, res) => {
@@ -51,13 +52,17 @@ const createReview = async (req, res) => {
 
 // .....................update review......................
 const updateReview = async (req, res) => {
-  const review = await findOneAndUpdate({ _id: req.params.id }, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const review = await Review.findOne({ _id: req.params.id });
   if (!review) {
     throw new CustomError.NotFoundError("Review not found");
   }
+  checkPermissions(req.user, review.user);
+  const { rating, title, comment } = req.body;
+  review.rating = rating;
+  review.title = title;
+  review.comment = comment;
+  await review.save();
+
   res.status(StatusCodes.OK).json({ success: true, review });
 };
 
@@ -69,10 +74,11 @@ const deleteReview = async (req, res) => {
       `Coldn't find review with id: ${req.params.id}`
     );
   }
+  checkPermissions(req.user, review.user);
   await review.remove();
   res.status(StatusCodes.OK).json({
     success: true,
-    message: `removed prduct with the id of ${req.params.id}`,
+    message: `removed review with the id of ${req.params.id}`,
   });
 };
 
