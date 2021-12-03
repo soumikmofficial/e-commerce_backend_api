@@ -57,7 +57,7 @@ const deleteProduct = async (req, res) => {
   await product.remove();
   res.status(StatusCodes.OK).json({
     success: true,
-    message: `removed prduct with the id of ${req.params.id}`,
+    message: `removed product with the id of ${req.params.id}`,
   });
 };
 
