@@ -12,7 +12,7 @@ const singleCartItemSchema = new mongoose.Schema({
   },
 });
 
-const reviewSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
   tax: {
     type: Number,
     required: true,
@@ -49,4 +49,4 @@ const reviewSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = mongoose.model("Order", orderSchema);
