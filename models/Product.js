@@ -51,6 +51,10 @@ const productSchema = new mongoose.Schema(
       required: [true, "Must specify stock size"],
       default: 10,
     },
+    numberOfReviews: {
+      type: Number,
+      default: 0,
+    },
     averageRating: {
       type: Number,
       default: 0,
