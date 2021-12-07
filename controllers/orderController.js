@@ -11,17 +11,28 @@ const fakeStripeAPI = async ({ amount, currency }) => {
 
 // ...................all orders...................
 const getAllOrders = async (req, res) => {
-  res.send("get all orders");
+  const orders = await Order.find({});
+  res
+    .status(StatusCodes.OK)
+    .json({ success: true, total: orders.length, orders });
 };
 
 // ....................single oreder....................
 const getSingleOrder = async (req, res) => {
-  res.send("get single orders");
+  const order = await Order.findOne({ _id: req.params.id });
+  if (!order) {
+    throw new CustomError.NotFoundError(`No order with id: ${req.params.id}`);
+  }
+  checkPermissions(req.user, order.user);
+  res.status(StatusCodes.OK).json({ success: true, order });
 };
 
 // .....................get current users orders.....................
 const getCurrentUserOrders = async (req, res) => {
-  res.send("current user");
+  const orders = await Order.find({ user: req.user.userId });
+  res
+    .status(StatusCodes.OK)
+    .json({ success: true, total: orders.length, orders });
 };
 
 // ........................create order.........................
@@ -83,7 +94,16 @@ const createOrder = async (req, res) => {
 
 // .....................update order.............................
 const updateOrder = async (req, res) => {
-  res.send("update orders");
+  const { paymentIntentId } = req.body;
+  const order = await Order.findOne({ _id: req.params.id });
+  if (!order) {
+    throw new CustomError.NotFoundError(`No order with id: ${req.params.id}`);
+  }
+  checkPermissions(req.user, order.user);
+  order.paymentIntentId = paymentIntentId;
+  order.status = "paid";
+  await order.save();
+  res.status(StatusCodes.OK).json({ success: true, order });
 };
 
 module.exports = {
